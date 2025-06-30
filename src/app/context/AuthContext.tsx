@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(storedToken);
 
         fetch('http://localhost:4000/cesizen/api/v1/auth/me', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${storedToken}`,
                 'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Récupérer infos utilisateur après login
         const meRes = await fetch('http://localhost:4000/cesizen/api/v1/auth/me', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',

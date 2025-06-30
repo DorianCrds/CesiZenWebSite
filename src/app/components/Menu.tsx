@@ -1,31 +1,52 @@
-// app/components/Menu.tsx
 'use client';
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
+type RoleLabel = 'super-admin' | 'admin' | 'user';
+
 interface MenuItem {
     id: number;
     label: string;
     slug: string;
-    requiredRole?: string | null;
+    requiredRole?: RoleLabel | number | null;
 }
 
 export default function NavigationMenu() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const { user, logout } = useAuth();
+    const { user, logout, token } = useAuth();
 
     const userRole = user?.role?.label || null;
 
     useEffect(() => {
         const fetchMenu = async () => {
-            const res = await fetch('http://localhost:4000/cesizen/api/v1/public-menu');
-            const data = await res.json();
-            setMenuItems(data);
+            try {
+                const endpoint = user && token
+                    ? 'http://localhost:4000/cesizen/api/v1/menu-items'
+                    : 'http://localhost:4000/cesizen/api/v1/public-menu';
+
+                const res = await fetch(endpoint, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                });
+
+                if (!res.ok) {
+                    console.error('Erreur lors du chargement du menu');
+                    return;
+                }
+
+                const data = await res.json();
+                setMenuItems(data);
+            } catch (error) {
+                console.error('Erreur réseau lors de la récupération du menu :', error);
+            }
         };
+
         fetchMenu();
-    }, []);
+    }, [user, token]);
 
     const rolePriority = (role: string) => {
         const levels: Record<string, number> = {
@@ -39,7 +60,22 @@ export default function NavigationMenu() {
     const filteredMenuItems = menuItems.filter((item) => {
         if (!item.requiredRole) return true;
         if (!userRole) return false;
-        return rolePriority(userRole) >= rolePriority(item.requiredRole);
+
+        const roleMap: Record<number, string> = {
+            1: 'super-admin',
+            2: 'admin',
+            3: 'user',
+        };
+
+        const itemRequiredRoleLabel =
+            typeof item.requiredRole === 'string'
+                ? item.requiredRole
+                : roleMap[item.requiredRole] ?? null;
+
+        return (
+            itemRequiredRoleLabel &&
+            rolePriority(userRole) >= rolePriority(itemRequiredRoleLabel)
+        );
     });
 
     return (
@@ -47,11 +83,16 @@ export default function NavigationMenu() {
             <div className="max-w-6xl mx-auto flex justify-between items-center">
                 <Link href="/" className="text-xl font-bold text-gray-800">CesiZen</Link>
                 <div className="flex space-x-6 items-center">
+                    <Link href="/a-propos" className="text-gray-700 hover:text-blue-600">
+                        À propos
+                    </Link>
+
                     {filteredMenuItems.map((item) => (
                         <Link key={item.id} href={`/${item.slug}`} className="text-gray-700 hover:text-blue-600">
                             {item.label}
                         </Link>
                     ))}
+
                     {user ? (
                         <>
                             <Link href="/profile" className="text-gray-700 hover:text-blue-600">Mon profil</Link>
