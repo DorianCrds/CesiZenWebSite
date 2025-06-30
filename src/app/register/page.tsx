@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
@@ -10,7 +11,7 @@ export default function RegisterPage() {
     const [lastname, setLastname] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
-    const { login } = useAuth(); // On va réutiliser login pour stocker user et token après inscription
+    const { login } = useAuth();
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -27,7 +28,6 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            // Appel API register
             const res = await fetch('http://localhost:4000/cesizen/api/v1/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -36,83 +36,87 @@ export default function RegisterPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                setError(data.error || 'Erreur lors de l\'inscription');
+                setError(data.error || "Erreur lors de l'inscription");
                 setLoading(false);
                 return;
             }
 
-            // Récupérer token reçu
             const { token } = await res.json();
             localStorage.setItem('token', token);
 
-            // Appeler login dans le contexte pour récupérer user et stocker token
             await login(email, password);
-
-            router.push('/'); // redirection après inscription
+            router.push('/');
         } catch (err) {
             setError('Erreur serveur');
+        } finally {
             setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-20 p-4 border rounded">
-            <h1 className="text-xl mb-4">Inscription</h1>
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
+            <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+                <h1 className="text-2xl font-bold text-center text-blue-800 mb-6">Créer un compte CesiZen</h1>
 
-            {error && <p className="text-red-600">{error}</p>}
+                {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
 
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="w-full mb-3 p-2 border"
-            />
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Prénom"
+                        value={firstname}
+                        onChange={e => setFirstname(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Nom"
+                        value={lastname}
+                        onChange={e => setLastname(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Mot de passe"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Confirmez le mot de passe"
+                        value={passwordConfirm}
+                        onChange={e => setPasswordConfirm(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+                    >
+                        {loading ? 'Chargement...' : "S'inscrire"}
+                    </button>
+                </form>
 
-            <input
-                type="text"
-                placeholder="Prénom"
-                value={firstname}
-                onChange={e => setFirstname(e.target.value)}
-                required
-                className="w-full mb-3 p-2 border"
-            />
-
-            <input
-                type="text"
-                placeholder="Nom"
-                value={lastname}
-                onChange={e => setLastname(e.target.value)}
-                required
-                className="w-full mb-3 p-2 border"
-            />
-
-            <input
-                type="password"
-                placeholder="Mot de passe"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                className="w-full mb-3 p-2 border"
-            />
-
-            <input
-                type="password"
-                placeholder="Confirmez le mot de passe"
-                value={passwordConfirm}
-                onChange={e => setPasswordConfirm(e.target.value)}
-                required
-                className="w-full mb-3 p-2 border"
-            />
-
-            <button
-                type="submit"
-                disabled={loading}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
-            >
-                {loading ? 'Chargement...' : 'S\'inscrire'}
-            </button>
-        </form>
+                <p className="text-center text-sm text-gray-600 mt-6">
+                    Vous avez déjà un compte ?{' '}
+                    <Link href="/login" className="text-blue-600 hover:underline">
+                        Se connecter
+                    </Link>
+                </p>
+            </div>
+        </main>
     );
 }
