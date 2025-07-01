@@ -88,6 +88,12 @@ export default function NavigationMenu() {
                             {item.label}
                         </Link>
                     ))}
+                    {userRole && rolePriority(userRole) >= rolePriority('admin') && (
+                        <Link href="/admin" className="text-gray-700 hover:text-blue-600">
+                            Administration
+                        </Link>
+                    )}
+
                     {user ? (
                         <>
                             <Link href="/profile" className="text-gray-700 hover:text-blue-600">Mon profil</Link>
