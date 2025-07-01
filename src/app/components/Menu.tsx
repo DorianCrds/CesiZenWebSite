@@ -83,16 +83,14 @@ export default function NavigationMenu() {
             <div className="max-w-6xl mx-auto flex justify-between items-center">
                 <Link href="/" className="text-xl font-bold text-gray-800">CesiZen</Link>
                 <div className="flex space-x-6 items-center">
-                    <Link href="/a-propos" className="text-gray-700 hover:text-blue-600">
-                        À propos
-                    </Link>
-
                     {filteredMenuItems.map((item) => (
                         <Link key={item.id} href={`/${item.slug}`} className="text-gray-700 hover:text-blue-600">
                             {item.label}
                         </Link>
                     ))}
-
+                    <Link href="/a-propos" className="text-gray-700 hover:text-blue-600">
+                        À propos
+                    </Link>
                     {user ? (
                         <>
                             <Link href="/profile" className="text-gray-700 hover:text-blue-600">Mon profil</Link>
