@@ -88,9 +88,6 @@ export default function NavigationMenu() {
                             {item.label}
                         </Link>
                     ))}
-                    <Link href="/a-propos" className="text-gray-700 hover:text-blue-600">
-                        À propos
-                    </Link>
                     {user ? (
                         <>
                             <Link href="/profile" className="text-gray-700 hover:text-blue-600">Mon profil</Link>
