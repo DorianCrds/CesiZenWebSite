@@ -18,6 +18,7 @@ interface User {
 
 export default function UsersAdminPage() {
     const [users, setUsers] = useState<User[]>([]);
+    const [loadingIds, setLoadingIds] = useState<number[]>([]); // pour gérer les boutons en cours
     const { token, user } = useAuth();
 
     const fetchUsers = async () => {
@@ -30,7 +31,6 @@ export default function UsersAdminPage() {
 
             const data = await res.json();
 
-            // Protection : assure que data est un tableau
             if (Array.isArray(data)) {
                 setUsers(data);
             } else {
@@ -44,18 +44,32 @@ export default function UsersAdminPage() {
     };
 
     const toggleActive = async (id: number, isActive: boolean) => {
+        setLoadingIds((prev) => [...prev, id]);
         try {
-            await fetch(`http://localhost:4000/cesizen/api/v1/users/${id}`, {
-                method: 'PUT',
+            const res = await fetch(`http://localhost:4000/cesizen/api/v1/users/${id}/toggle`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ isActive: !isActive }),
             });
-            fetchUsers(); // rafraîchit la liste
+
+            if (!res.ok) {
+                throw new Error(`Erreur serveur: ${res.status}`);
+            }
+
+            // Mise à jour optimiste de l'état local
+            setUsers((prevUsers) =>
+                prevUsers.map((u) =>
+                    u.id === id ? { ...u, isActive: !isActive } : u
+                )
+            );
         } catch (err) {
             console.error('Erreur lors du changement d\'état utilisateur :', err);
+            alert('Une erreur est survenue lors de la modification du statut utilisateur.');
+        } finally {
+            setLoadingIds((prev) => prev.filter((loadingId) => loadingId !== id));
         }
     };
 
@@ -84,6 +98,7 @@ export default function UsersAdminPage() {
                     .map(u => {
                         const isAdmin = u.role?.label === 'admin';
                         const canToggle = isSuperAdmin || (!isAdmin && u.role.label === 'user');
+                        const isLoading = loadingIds.includes(u.id);
 
                         return (
                             <tr key={u.id} className="text-center border-t">
@@ -97,9 +112,14 @@ export default function UsersAdminPage() {
                                     {canToggle ? (
                                         <button
                                             onClick={() => toggleActive(u.id, u.isActive)}
-                                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            className={`px-3 py-1 rounded text-white ${u.isActive ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-600 hover:bg-green-700'}`}
+                                            disabled={isLoading}
                                         >
-                                            {u.isActive ? 'Désactiver' : 'Réactiver'}
+                                            {isLoading
+                                                ? '...'
+                                                : u.isActive
+                                                    ? 'Désactiver'
+                                                    : 'Réactiver'}
                                         </button>
                                     ) : (
                                         <span className="text-gray-400">--</span>
