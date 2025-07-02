@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation'; // Import du hook router
 
 type RoleLabel = 'super-admin' | 'admin' | 'user';
 
@@ -16,6 +17,7 @@ interface MenuItem {
 export default function NavigationMenu() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const { user, logout, token } = useAuth();
+    const router = useRouter(); // Initialisation du router
 
     const userRole = user?.role?.label || null;
 
@@ -78,6 +80,11 @@ export default function NavigationMenu() {
         );
     });
 
+    const handleLogout = () => {
+        logout();
+        router.push('/');
+    };
+
     return (
         <nav className="bg-white shadow px-4 py-3 sticky top-0 z-50">
             <div className="max-w-6xl mx-auto flex justify-between items-center">
@@ -97,7 +104,7 @@ export default function NavigationMenu() {
                     {user ? (
                         <>
                             <Link href="/profile" className="text-gray-700 hover:text-blue-600">Mon profil</Link>
-                            <button onClick={logout} className="text-red-500 hover:text-red-600">Déconnexion</button>
+                            <button onClick={handleLogout} className="text-red-500 hover:text-red-600">Déconnexion</button>
                         </>
                     ) : (
                         <Link href="/login" className="text-blue-600 hover:text-blue-700">Connexion</Link>
