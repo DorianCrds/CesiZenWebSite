@@ -51,7 +51,7 @@ export default function ContentAdminPage() {
                                     <p className="text-sm text-gray-500">Slug : {page.slug}</p>
                                 </div>
                                 <Link
-                                    href={`/admin/content/${page.id}`}
+                                    href={`/admin/content/${page.slug}`}
                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                 >
                                     Modifier
