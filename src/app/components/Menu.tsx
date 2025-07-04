@@ -68,6 +68,7 @@ export default function NavigationMenu() {
                     )}
                     {user ? (
                         <>
+                            <Link href="/questionnaire/1" className="text-gray-700 hover:text-blue-600">Questionnaire</Link>
                             <Link href="/profile" className="text-gray-700 hover:text-blue-600">Mon profil</Link>
                             <button onClick={handleLogout} className="text-red-500 hover:text-red-600">Déconnexion</button>
                         </>
