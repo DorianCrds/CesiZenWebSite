@@ -3,10 +3,13 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import {useAuth} from "@/app/context/AuthContext";
 
 export default function QuestionnairePage() {
     const { id } = useParams();
     const router = useRouter();
+    const { user } = useAuth();
+
 
     const [questionnaire, setQuestionnaire] = useState<any>(null);
     const [events, setEvents] = useState<any[]>([]);
@@ -31,24 +34,29 @@ export default function QuestionnairePage() {
     };
 
     const handleSubmit = async () => {
+        if (!user) {
+            console.error("Utilisateur non authentifié.");
+            return;
+        }
+
         const selected = events.filter(e => selectedEventIds.includes(e.id));
         const totalScore = selected.reduce((acc, ev) => acc + ev.score, 0);
 
         try {
-            const response = await axios.post('/cesizen/api/v1/user-responses', {
-                userId: 123, // à remplacer par une valeur dynamique (ex : depuis le contexte d'auth)
+            const response = await axios.post('http://localhost:4000/cesizen/api/v1/user-responses', {
+                userId: user.id,
                 questionnaireId: parseInt(id as string),
-                selectedEvents: JSON.stringify(selectedEventIds),
-                totalScore,
+                selectedEvents: selectedEventIds,
             }, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
 
-            router.push(`/result/${response.data.id}`);
+            router.push(`/resultat/${response.data.id}`);
         } catch (err) {
             console.error('Erreur lors de la soumission :', err);
         }
     };
+
 
     if (!questionnaire) return <div>Chargement…</div>;
 
