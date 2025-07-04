@@ -39,6 +39,14 @@ export default function ContentAdminPage() {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4">Gestion du contenu des pages</h1>
+
+            <Link
+                href="/admin/content/new"
+                className="inline-block mb-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+                ➕ Créer une nouvelle page
+            </Link>
+
             {pages.length === 0 ? (
                 <p>Aucune page trouvée.</p>
             ) : (
@@ -66,14 +74,11 @@ export default function ContentAdminPage() {
                                         {page.content
                                             .sort((a, b) => a.order - b.order)
                                             .map((block) => (
-                                                <li
-                                                    key={block.id}
-                                                    className="bg-gray-100 p-3 rounded border"
-                                                >
+                                                <li key={block.id} className="bg-gray-100 p-3 rounded border">
                                                     <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-semibold">
-                                                            [{block.order}] {block.type}
-                                                        </span>
+                            <span className="text-sm font-semibold">
+                              [{block.order}] {block.type}
+                            </span>
                                                     </div>
                                                     <div className="text-sm text-gray-700 mt-2">
                                                         {block.content.length > 120
