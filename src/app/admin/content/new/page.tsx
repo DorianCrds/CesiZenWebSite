@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
+import { useMenu } from '../MenuContext';
 
 interface ContentBlock {
     id?: number;
@@ -20,6 +21,7 @@ interface PageData {
 export default function CreatePage() {
     const router = useRouter();
     const { token } = useAuth();
+    const { refreshMenu } = useMenu();
 
     const [page, setPage] = useState<PageData>({
         title: '',
@@ -120,7 +122,7 @@ export default function CreatePage() {
                 body: JSON.stringify({
                     label: page.title,
                     slug: cleanSlug,
-                    order: 1, // à adapter si nécessaire
+                    order: 1,
                     pageId: createdPage.id,
                     isPublic: true,
                     requiredRole: null,
@@ -133,6 +135,8 @@ export default function CreatePage() {
                 setSaving(false);
                 return;
             }
+
+            await refreshMenu(); // 👈 rafraîchissement du menu global
 
             alert('✅ Page, blocs et menu créés avec succès');
             router.push('/admin/content');

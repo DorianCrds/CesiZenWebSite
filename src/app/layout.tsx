@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 
 // Import du menu
 import NavigationMenu from './components/Menu';
+import {MenuProvider} from "@/app/admin/content/MenuContext";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,8 +28,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="fr">
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>
-            <NavigationMenu />  {/* <-- Ici on inclut le menu */}
-            {children}
+            <MenuProvider>
+                <NavigationMenu />
+                {children}
+            </MenuProvider>
         </AuthProvider>
         </body>
         </html>
