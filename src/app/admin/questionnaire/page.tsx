@@ -324,11 +324,8 @@ export default function QuestionnaireAdminPage() {
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
-                                        onClick={(e) => {
-                                            // Créer un événement artificiel pour handleSubmit
-                                            const fakeEvent = {
-                                                preventDefault: () => {}
-                                            };
+                                        onClick={() => {
+                                            const fakeEvent = { preventDefault: () => {} } as unknown as React.FormEvent<HTMLFormElement>;
                                             handleSubmit(fakeEvent);
                                         }}
                                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -336,6 +333,7 @@ export default function QuestionnaireAdminPage() {
                                     >
                                         {editingEvent ? 'Modifier' : 'Créer'}
                                     </button>
+
                                     <button
                                         type="button"
                                         onClick={resetForm}
