@@ -6,6 +6,7 @@ interface MenuItem {
     label: string;
     slug: string;
     order: number;
+    requiredRole?: number | string;
 }
 
 interface MenuContextType {
