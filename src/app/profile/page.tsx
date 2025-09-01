@@ -43,8 +43,8 @@ export default function ProfilePage() {
 
                 <div className="text-gray-600 text-sm border-t pt-4">
                     <p><strong>Compte actif :</strong> {user.isActive ? 'Oui' : 'Non'}</p>
-                    <p><strong>Créé le :</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
-                    <p><strong>Dernière mise à jour :</strong> {new Date(user.updatedAt).toLocaleDateString()}</p>
+                    <p><strong>Créé le :</strong> {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</p>
+                    <p><strong>Dernière mise à jour :</strong> {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : "N/A"}</p>
                 </div>
             </div>
         </main>
