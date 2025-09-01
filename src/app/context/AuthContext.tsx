@@ -9,6 +9,7 @@ interface User {
     firstname: string;
     lastname: string;
     role: { id: number; label: string };
+    isActive?: boolean;
 }
 
 interface AuthContextType {
